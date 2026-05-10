@@ -1,9 +1,9 @@
 export const languages = {
-  fr: 'Français',
   en: 'English',
+  fr: 'Français',
 } as const;
 
-export const defaultLang = 'fr';
+export const defaultLang = 'en';
 export type Lang = keyof typeof languages;
 export const langs = Object.keys(languages) as Lang[];
 

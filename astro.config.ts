@@ -13,19 +13,19 @@ export default defineConfig({
     format: 'directory',
   },
   i18n: {
-    defaultLocale: 'fr',
-    locales: ['fr', 'en'],
+    defaultLocale: 'en',
+    locales: ['en', 'fr'],
     routing: { prefixDefaultLocale: true },
   },
   redirects: {
-    '/': '/fr',
+    '/': '/en',
   },
   integrations: [
     mdx(),
     sitemap({
       i18n: {
-        defaultLocale: 'fr',
-        locales: { fr: 'fr-FR', en: 'en-US' },
+        defaultLocale: 'en',
+        locales: { en: 'en-US', fr: 'fr-FR' },
       },
     }),
   ],

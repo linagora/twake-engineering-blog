@@ -1,76 +1,75 @@
 # Linagora Engineering Blog
 
-Le blog d'ingénierie de Linagora — articles techniques bilingues (FR / EN) générés statiquement à partir de fichiers Markdown.
-
-> _The Linagora engineering blog — bilingual (FR/EN) technical articles, statically generated from Markdown files._
+The Linagora engineering blog — bilingual (EN / FR) technical articles, statically generated from Markdown files.
 
 ---
 
 ## Stack
 
-- [**Astro 5**](https://astro.build) — generateur statique
-- [**Tailwind CSS 4**](https://tailwindcss.com) — styling via tokens CSS
-- [**MDX**](https://mdxjs.com) — Markdown enrichi pour les articles
-- [**Shiki**](https://shiki.style) — coloration syntaxique
-- [**Pagefind**](https://pagefind.app) — recherche full-text côté client
-- **TypeScript** strict partout
+- [**Astro 5**](https://astro.build) — static site generator
+- [**Tailwind CSS 4**](https://tailwindcss.com) — styling via CSS tokens
+- [**MDX**](https://mdxjs.com) — enriched Markdown for articles
+- [**Shiki**](https://shiki.style) — syntax highlighting
+- [**Pagefind**](https://pagefind.app) — client-side full-text search
+- **TypeScript** strict throughout
 
 ---
 
-## Démarrage rapide
+## Quick start
 
 ```bash
+nvm use 22           # Astro 5 requires Node 20+
 npm install
 npm run dev          # http://localhost:4321
-npm run build        # build statique + index Pagefind dans dist/
-npm run preview      # serveur local pour tester le build
+npm run build        # static build + Pagefind index in dist/
+npm run preview      # local server to test the build
 ```
 
-> En `dev`, l'index de recherche Pagefind n'est pas généré : la recherche affiche un fallback.
-> Pour la tester en local, faire `npm run build && npm run preview`.
+> In `dev` mode the Pagefind search index is not generated — the search modal shows a fallback.
+> To test it locally, run `npm run build && npm run preview`.
 
 ---
 
-## Écrire un article
+## Writing an article
 
-### 1. Nommage du fichier
+### 1. File naming
 
 ```
 src/content/posts/<slug>.<lang>.md
 ```
 
-- `<slug>` : url-friendly, en kebab-case, **identique entre FR et EN** pour lier les traductions.
-- `<lang>` : `fr` ou `en`.
+- `<slug>` — URL-friendly, kebab-case, **identical between EN and FR** to link the translations.
+- `<lang>` — `en` or `fr`.
 
-Exemples :
+Examples:
 
 ```
-src/content/posts/migrer-vers-astro.fr.md
-src/content/posts/migrer-vers-astro.en.md
-src/content/posts/post-mortem-incident-mai.fr.md   # FR uniquement, OK
+src/content/posts/migrating-to-astro.en.md
+src/content/posts/migrating-to-astro.fr.md
+src/content/posts/post-mortem-may-incident.en.md   # EN-only, OK
 ```
 
-Un article qui n'existe que dans une langue **n'apparaîtra pas dans la liste de l'autre langue** et le bouton de switch sera désactivé.
+An article that exists in only one language **will not appear in the other language's listing** and the language switcher button will be disabled.
 
 ### 2. Frontmatter
 
 ```yaml
 ---
-title: Mon super article
-description: Un résumé court (~160 caractères) qui sert pour le SEO et les cards.
-date: 2026-05-04                # ISO date (obligatoire)
-updated: 2026-06-01             # optionnel
-authors: [linagora-team]        # IDs de fichiers dans src/content/authors/ (au moins 1)
-tags: [astro, devops]           # optionnel
-cover: /covers/mon-article.jpg  # optionnel — chemin dans public/
-coverAlt: Description alt        # recommandé si cover
-draft: false                    # optionnel, défaut false
+title: My great article
+description: A short summary (~160 chars) used for SEO and cards.
+date: 2026-05-04                # ISO date (required)
+updated: 2026-06-01             # optional
+authors: [linagora-team]        # IDs of files in src/content/authors/ (at least one)
+tags: [astro, devops]           # optional
+cover: /covers/my-article.jpg   # optional — path under public/
+coverAlt: Description           # required if `cover` is set
+draft: false                    # optional, defaults to false
 ---
 ```
 
-### 3. Corps
+### 3. Body
 
-Markdown standard ou MDX. Coloration syntaxique automatique :
+Plain Markdown or MDX. Syntax highlighting is automatic:
 
 ````markdown
 ```ts
@@ -78,7 +77,7 @@ const hello = (name: string) => `Hello ${name}!`;
 ```
 ````
 
-### 4. Ajouter un auteur
+### 4. Adding an author
 
 ```
 src/content/authors/<id>.md
@@ -88,102 +87,103 @@ src/content/authors/<id>.md
 ---
 name: Jane Doe
 title: Senior Software Engineer
-bio: Une bio courte.
-avatar: /authors/jane-doe.jpg   # optionnel, dans public/
-github: janedoe                 # optionnel
-linkedin: janedoe               # optionnel (slug LinkedIn)
+bio: A short bio.
+avatar: /authors/jane-doe.jpg   # optional, in public/
+github: janedoe                 # optional
+linkedin: janedoe               # optional (LinkedIn slug)
 mastodon: https://floss.social/@janedoe
 website: https://janedoe.dev
 ---
 ```
 
-Référencez l'auteur dans le frontmatter de votre article : `authors: [jane-doe]`.
+Reference the author in the article frontmatter: `authors: [jane-doe]`.
 
 ### 5. Workflow
 
-1. **Forkez** le dépôt (ou créez une branche si vous avez les droits)
-2. **Ajoutez** votre/vos fichier(s) `.md`
-3. **Testez** localement : `npm run build`
-4. **Ouvrez une Pull Request** vers `main`
+1. **Fork** the repository (or create a branch if you have direct access)
+2. **Add** your `.md` file(s)
+3. **Test** locally: `npm run build`
+4. **Open a Pull Request** against `main`
 
-La CI valide le build et le typecheck. Après merge sur `main`, l'image Docker est publiée sur GHCR.
+CI validates the build and the type-check. After merging to `main`, the Docker image is published to GHCR.
 
 ---
 
-## Structure du projet
+## Project structure
 
 ```
 src/
 ├── content/
-│   ├── posts/           # ← articles .md (un par langue)
-│   └── authors/         # ← profils auteurs
-├── content.config.ts    # schémas Zod (frontmatter)
-├── i18n/                # strings UI + helpers de routing
+│   ├── posts/           # ← articles (.md, one per language)
+│   └── authors/         # ← author profiles
+├── content.config.ts    # Zod schemas (frontmatter)
+├── i18n/                # UI strings + routing helpers
 ├── layouts/             # Base + Post layouts
-├── components/          # composants Astro réutilisables
-├── pages/[lang]/        # pages dynamiques par langue
-├── lib/posts.ts         # helpers de requête sur la collection
-├── styles/global.css    # tokens CSS + styles prose
-└── site.config.ts       # nom, URL, infos du repo GitHub
+├── components/          # reusable Astro components
+├── pages/[lang]/        # dynamic per-language pages
+├── lib/posts.ts         # collection query helpers
+├── styles/global.css    # CSS tokens + prose styles
+└── site.config.ts       # name, URL, GitHub repo info
 ```
 
 ---
 
-## Personnaliser
+## Customising
 
-| Quoi | Où |
+| What | Where |
 |---|---|
-| Nom du blog, repo GitHub, URLs sociaux | `src/site.config.ts` |
-| Tokens couleur, typo, dark mode | `src/styles/global.css` |
-| Strings d'interface (FR/EN) | `src/i18n/ui.ts` |
-| Page À propos | `src/pages/[lang]/about.astro` |
-| Logo / favicon | `public/favicon.svg` |
-| Image OG par défaut | `public/og-default.svg` _(remplaçable par `.png` 1200×630)_ |
+| Blog name, GitHub repo, social URLs | `src/site.config.ts` |
+| Colour tokens, typography, dark mode | `src/styles/global.css` |
+| UI strings (EN/FR) | `src/i18n/ui.ts` |
+| About page copy | `src/pages/[lang]/about.astro` |
+| Logo / favicon | `public/favicon.svg`, `src/components/LinagoraLogo.astro` |
+| Default OG image | `public/og-default.svg` _(or replace with a 1200×630 `.png`)_ |
+| Auto-generated cover gradients | `src/components/AutoCover.astro` |
 
 ---
 
-## Déploiement
+## Deployment
 
-### Image Docker
+### Docker image
 
 ```bash
 docker build -t linagora/engineering-blog:latest .
 docker run -p 8080:8080 linagora/engineering-blog:latest
 ```
 
-L'image expose le site sur le port `8080` via nginx.
+The image serves the site on port `8080` via nginx.
 
 ### CI/CD
 
-Le workflow `.github/workflows/deploy.yml` builde et pousse l'image sur **GHCR** (`ghcr.io/linagora/engineering-blog`) à chaque push sur `main`.
+The `.github/workflows/deploy.yml` workflow builds and pushes the image to **GHCR** (`ghcr.io/<owner>/<repo>`) on every push to `main`.
 
-**À brancher sur l'infra Linagora** (étape laissée en TODO dans le workflow) :
-- Soit SSH + `docker compose pull && docker compose up -d`
-- Soit `kubectl set image` sur un Deployment Kubernetes
-- Soit webhook vers un orchestrateur interne
+**To wire on Linagora infrastructure** (left as a TODO in the workflow):
+- Either SSH + `docker compose pull && docker compose up -d`
+- Or `kubectl set image` on a Kubernetes Deployment
+- Or a webhook to an internal orchestrator
 
-### Variables / configuration
+### Configuration
 
-| Endroit | Quoi |
+| File | What |
 |---|---|
-| `src/site.config.ts` | URL canonique du site (modifie `SITE.url`), org/repo GitHub pour les liens "Edit on GitHub" |
-| `astro.config.ts` | Config i18n, redirects, intégrations |
+| `src/site.config.ts` | Canonical site URL (edit `SITE.url`), GitHub org/repo for the "Edit on GitHub" links |
+| `astro.config.ts` | i18n config, redirects, integrations |
 
 ---
 
-## Recherche
+## Search
 
-Pagefind indexe le contenu balisé `data-pagefind-body` (= chaque article). L'index est généré à la fin de `npm run build` dans `dist/pagefind/`.
+Pagefind indexes content tagged with `data-pagefind-body` (= each article body). The index is generated at the end of `npm run build` under `dist/pagefind/`.
 
-Le filtre par langue est automatique : Pagefind respecte l'attribut `lang` du `<html>` de chaque page.
+Language filtering is automatic: Pagefind respects the `lang` attribute of the page's `<html>` tag.
 
-Raccourci : <kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>.
+Shortcut: <kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>.
 
 ---
 
 ## Licence
 
-Le code de ce blog est sous licence [AGPL-3.0]. Les articles publiés appartiennent à leurs auteurs et sont diffusés sous [CC BY-SA 4.0] sauf mention contraire dans le frontmatter (`license: ...`).
+The blog code is licensed under [AGPL-3.0]. Published articles belong to their authors and are released under [CC BY-SA 4.0] unless the frontmatter states otherwise (`license: ...`).
 
 [AGPL-3.0]: https://www.gnu.org/licenses/agpl-3.0.html
 [CC BY-SA 4.0]: https://creativecommons.org/licenses/by-sa/4.0/
