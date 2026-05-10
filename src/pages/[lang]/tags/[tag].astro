@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticleCard from '../../../components/ArticleCard.astro';
+import { getAllTags, getPostsByTag } from '../../../lib/posts';
+import { useTranslations } from '../../../i18n/utils';
+import { langs, type Lang } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of langs) {
+    const tags = await getAllTags(lang);
+    for (const tag of tags.keys()) {
+      paths.push({ params: { lang, tag }, props: { tag } });
+    }
+  }
+  return paths;
+}
+
+const lang = Astro.params.lang as Lang;
+const { tag } = Astro.props;
+const t = useTranslations(lang);
+const posts = await getPostsByTag(lang, tag);
+---
+
+<BaseLayout title={`#${tag}`}>
+  <section class="container-page py-14 md:py-20">
+    <p class="text-sm text-muted uppercase tracking-wider">{t('tags.articlesFor')}</p>
+    <h1 class="text-3xl md:text-5xl font-bold tracking-tight mt-2">#{tag}</h1>
+
+    {
+      posts.length === 0 ? (
+        <p class="mt-8 text-muted">{t('tags.noArticles')}</p>
+      ) : (
+        <div class="mt-10 grid md:grid-cols-2 gap-6">
+          {posts.map((post) => (
+            <ArticleCard post={post} />
+          ))}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

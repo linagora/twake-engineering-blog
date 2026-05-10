@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { githubRepoUrl } from '../../site.config';
+import { langs, type Lang } from '../../i18n/ui';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+
+const content = {
+  fr: {
+    title: 'À propos',
+    intro:
+      "Bienvenue sur le blog d'ingénierie de Linagora. Nous y partageons les coulisses techniques de nos produits — Twake Workplace, OpenPaaS, et tout ce qui fait l'open source chez nous : retours d'expérience, choix d'architecture, leçons tirées des erreurs.",
+    sections: [
+      {
+        title: 'Pourquoi ce blog ?',
+        body: "Parce que la connaissance qui ne sort pas du dépôt git, c'est de la connaissance perdue. Et parce qu'on aime confronter nos idées à la communauté.",
+      },
+      {
+        title: 'Qui écrit ?',
+        body: "Toute l'équipe tech : ingénieur·e·s, SRE, designers produit, contributeur·trice·s open source. Chaque article est passé en revue par les pairs avant d'être publié.",
+      },
+      {
+        title: 'Contribuer',
+        bodyHtml: `Le blog est <a href="${githubRepoUrl()}" class="text-accent hover:underline">open source sur GitHub</a>. Les articles sont écrits en Markdown et soumis par Pull Request. Le guide est dans le README du dépôt.`,
+      },
+    ],
+  },
+  en: {
+    title: 'About',
+    intro:
+      'Welcome to the Linagora engineering blog. We share what goes on behind the scenes of our products — Twake Workplace, OpenPaaS, and everything open source we build: lessons learned, architectural decisions, and the occasional post-mortem.',
+    sections: [
+      {
+        title: 'Why this blog?',
+        body: 'Because knowledge that never leaves the git repository is knowledge lost. And because we like to put our ideas in front of the community.',
+      },
+      {
+        title: 'Who writes?',
+        body: 'The whole engineering team: engineers, SREs, product designers, open source contributors. Every article goes through peer review before publication.',
+      },
+      {
+        title: 'Contributing',
+        bodyHtml: `This blog is <a href="${githubRepoUrl()}" class="text-accent hover:underline">open source on GitHub</a>. Articles are written in Markdown and submitted via Pull Request. The contribution guide lives in the repository's README.`,
+      },
+    ],
+  },
+}[lang];
+---
+
+<BaseLayout title={content.title}>
+  <section class="container-page py-14 md:py-20">
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tight">{content.title}</h1>
+
+    <div class="prose-article mt-8">
+      <p class="text-lg text-muted-strong">{content.intro}</p>
+
+      {
+        content.sections.map((s) => (
+          <Fragment>
+            <h2>{s.title}</h2>
+            {'bodyHtml' in s ? <p set:html={s.bodyHtml} /> : <p>{s.body}</p>}
+          </Fragment>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

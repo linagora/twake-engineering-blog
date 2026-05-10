@@ -1,0 +1,36 @@
+---
+import { render } from 'astro:content';
+import PostLayout from '../../../layouts/PostLayout.astro';
+import { getAllPosts } from '../../../lib/posts';
+import type { Lang } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const all = await getAllPosts();
+  // Map slug → set of available languages, so each post knows which translations exist.
+  const translationsBySlug = new Map<string, Lang[]>();
+  for (const p of all) {
+    const list = translationsBySlug.get(p.slug) ?? [];
+    list.push(p.lang);
+    translationsBySlug.set(p.slug, list);
+  }
+  return all.map((post) => ({
+    params: { lang: post.lang, slug: post.slug },
+    props: {
+      post,
+      availableTranslations: translationsBySlug.get(post.slug) ?? [post.lang],
+    },
+  }));
+}
+
+const { post, availableTranslations } = Astro.props;
+const { Content, remarkPluginFrontmatter } = await render(post.entry);
+const minutesRead = (remarkPluginFrontmatter as { minutesRead?: number }).minutesRead ?? 1;
+---
+
+<PostLayout
+  post={post}
+  minutesRead={minutesRead}
+  availableTranslations={availableTranslations}
+>
+  <Content />
+</PostLayout>

@@ -1,0 +1,127 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<dialog
+  data-search-modal
+  class="bg-bg text-fg p-0 m-0 max-w-2xl w-[92%] mx-auto mt-[10vh] rounded-lg shadow-2xl border border-border backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+  aria-label={t('search.title')}
+>
+  <div class="flex items-center justify-between px-5 pt-4 pb-2 border-b border-border">
+    <h2 class="text-sm font-medium text-muted">{t('search.title')}</h2>
+    <button
+      type="button"
+      data-search-close
+      class="btn-ghost p-1.5"
+      aria-label={t('search.close')}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 6 6 18"></path>
+        <path d="m6 6 12 12"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="p-5">
+    <div id="pagefind-search" class="pagefind-ui" data-lang={lang}></div>
+    <p
+      data-search-fallback
+      class="text-sm text-muted py-6 text-center hidden"
+    >
+      {t('search.empty')}
+    </p>
+  </div>
+</dialog>
+
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+
+<script is:inline define:vars={{ lang, placeholder: t('search.placeholder') }}>
+  // Pagefind UI script is generated only at build time. In dev mode the search will be inert.
+  let initialized = false;
+
+  const modal = document.querySelector('[data-search-modal]');
+  const openButtons = document.querySelectorAll('[data-search-open]');
+  const closeButton = document.querySelector('[data-search-close]');
+
+  async function initSearch() {
+    if (initialized) return;
+    initialized = true;
+    try {
+      // @ts-ignore - injected at build by Pagefind
+      const { PagefindUI } = await import('/pagefind/pagefind-ui.js');
+      // Pagefind auto-detects the host page's <html lang> at query time and
+      // serves only the matching language sub-index, so cross-language results
+      // are filtered out without any explicit option.
+      new PagefindUI({
+        element: '#pagefind-search',
+        showSubResults: true,
+        showImages: false,
+        resetStyles: false,
+        excerptLength: 25,
+        placeholder,
+        translations: lang === 'fr'
+          ? {
+              placeholder,
+              clear_search: 'Effacer',
+              load_more: 'Charger plus',
+              search_label: 'Rechercher',
+              filters_label: 'Filtres',
+              zero_results: 'Aucun résultat pour [SEARCH_TERM]',
+              many_results: '[COUNT] résultats pour [SEARCH_TERM]',
+              one_result: '1 résultat pour [SEARCH_TERM]',
+              alt_search: 'Aucun résultat pour [SEARCH_TERM]. Essayez [DIFFERENT_TERM]',
+              search_suggestion: 'Aucun résultat. Essayez d\'autres termes.',
+              searching: 'Recherche en cours…',
+            }
+          : {
+              placeholder,
+              clear_search: 'Clear',
+              load_more: 'Load more',
+              search_label: 'Search',
+              filters_label: 'Filters',
+              zero_results: 'No results for [SEARCH_TERM]',
+              many_results: '[COUNT] results for [SEARCH_TERM]',
+              one_result: '1 result for [SEARCH_TERM]',
+              alt_search: 'No results for [SEARCH_TERM]. Try [DIFFERENT_TERM]',
+              search_suggestion: 'No results. Try a different query.',
+              searching: 'Searching…',
+            },
+      });
+    } catch (err) {
+      console.warn('[search] Pagefind index not available (run `npm run build` to generate it).', err);
+      const fallback = document.querySelector('[data-search-fallback]');
+      fallback?.classList.remove('hidden');
+    }
+  }
+
+  function open() {
+    if (!(modal instanceof HTMLDialogElement)) return;
+    modal.showModal();
+    initSearch().then(() => {
+      const input = modal.querySelector('input[type="text"]');
+      if (input instanceof HTMLInputElement) input.focus();
+    });
+  }
+
+  function close() {
+    if (modal instanceof HTMLDialogElement && modal.open) modal.close();
+  }
+
+  openButtons.forEach((btn) => btn.addEventListener('click', open));
+  closeButton?.addEventListener('click', close);
+
+  // ⌘K / Ctrl+K to open
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      open();
+    }
+  });
+
+  // Click on backdrop closes
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) close();
+  });
+</script>

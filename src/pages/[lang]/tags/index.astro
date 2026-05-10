@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TagPill from '../../../components/TagPill.astro';
+import { getAllTags } from '../../../lib/posts';
+import { useTranslations } from '../../../i18n/utils';
+import { langs, type Lang } from '../../../i18n/ui';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+const tags = await getAllTags(lang);
+---
+
+<BaseLayout title={t('tags.title')}>
+  <section class="container-page py-14 md:py-20">
+    <h1 class="text-3xl md:text-5xl font-bold tracking-tight">{t('tags.title')}</h1>
+
+    {
+      tags.size === 0 ? (
+        <p class="mt-8 text-muted">{t('tags.empty')}</p>
+      ) : (
+        <div class="mt-10 flex flex-wrap gap-2.5">
+          {[...tags.entries()].map(([tag, count]) => (
+            <TagPill tag={tag} count={count} />
+          ))}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

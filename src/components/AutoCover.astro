@@ -1,0 +1,70 @@
+---
+interface Props {
+  slug: string;
+  tag?: string;
+  title?: string;
+  class?: string;
+}
+
+const { slug, tag, title, class: className = '' } = Astro.props;
+
+// Stable hash from the slug, used to deterministically pick a gradient.
+function hash(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+// Each gradient is a paired stop (top-left → bottom-right) tuned to feel like
+// the Twake/Linagora palette: a warm-red anchor, a cool indigo/blue companion,
+// and a few neutral options. They all read on both light and dark backgrounds.
+const gradients = [
+  ['#e63946', '#7a1f2a'], // accent red
+  ['#5b8def', '#2b3f7a'], // indigo
+  ['#0ea5a5', '#054b4b'], // teal
+  ['#f59e0b', '#7c4a00'], // amber
+  ['#a855f7', '#4b1e7a'], // purple
+  ['#22c55e', '#0e4a25'], // emerald
+];
+
+const [from, to] = gradients[hash(slug) % gradients.length];
+const angle = (hash(slug + 'a') % 60) + 110; // 110° → 170°, biased to diagonal
+---
+
+<div
+  class:list={['relative overflow-hidden bg-[var(--cover-from)]', className]}
+  style={`--cover-from:${from};--cover-to:${to};`}
+  aria-hidden={!title}
+  role={title ? 'img' : undefined}
+  aria-label={title}
+>
+  <svg
+    class="absolute inset-0 w-full h-full"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 800 500"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <defs>
+      <linearGradient id={`grad-${slug}`} x1="0" y1="0" x2="1" y2="1" gradientTransform={`rotate(${angle - 135} 0.5 0.5)`}>
+        <stop offset="0%" stop-color={from} />
+        <stop offset="100%" stop-color={to} />
+      </linearGradient>
+      <pattern id={`grid-${slug}`} width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1" />
+      </pattern>
+    </defs>
+    <rect width="800" height="500" fill={`url(#grad-${slug})`} />
+    <rect width="800" height="500" fill={`url(#grid-${slug})`} />
+    <circle cx="640" cy="120" r="220" fill="rgba(255,255,255,0.08)" />
+    <circle cx="160" cy="380" r="160" fill="rgba(0,0,0,0.12)" />
+  </svg>
+
+  {
+    tag && (
+      <span class="absolute bottom-3 left-3 text-[0.65rem] uppercase tracking-[0.18em] font-semibold text-white/85 backdrop-blur-sm bg-black/15 px-2 py-1 rounded">
+        #{tag}
+      </span>
+    )
+  }
+</div>

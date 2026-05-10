@@ -1,0 +1,21 @@
+---
+import { getLangFromUrl, localizedPath } from '../i18n/utils';
+
+interface Props {
+  tag: string;
+  count?: number;
+  size?: 'sm' | 'md';
+}
+
+const { tag, count, size = 'md' } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+---
+
+<a
+  href={localizedPath(lang, `tags/${tag}`)}
+  class:list={['pill', size === 'sm' && 'text-xs px-2']}
+  rel="tag"
+>
+  <span>#{tag}</span>
+  {count !== undefined && <span class="ml-1.5 text-muted">({count})</span>}
+</a>

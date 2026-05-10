@@ -1,0 +1,49 @@
+---
+import type { AuthorEntry } from '../lib/posts';
+
+interface Props {
+  author: AuthorEntry;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+const { author, size = 'md' } = Astro.props;
+
+const dimensions = {
+  sm: { px: 24, cls: 'w-6 h-6 text-[10px]' },
+  md: { px: 32, cls: 'w-8 h-8 text-xs' },
+  lg: { px: 64, cls: 'w-16 h-16 text-base' },
+}[size];
+
+const initials = author.data.name
+  .split(/\s+/)
+  .map((p) => p[0])
+  .filter(Boolean)
+  .slice(0, 2)
+  .join('')
+  .toUpperCase();
+---
+
+{
+  author.data.avatar ? (
+    <img
+      src={author.data.avatar}
+      alt={author.data.name}
+      width={dimensions.px}
+      height={dimensions.px}
+      class:list={[dimensions.cls, 'rounded-full object-cover border border-border']}
+      loading="lazy"
+      decoding="async"
+    />
+  ) : (
+    <span
+      class:list={[
+        dimensions.cls,
+        'rounded-full bg-surface-hover border border-border inline-flex items-center justify-center font-semibold text-muted-strong',
+      ]}
+      aria-label={author.data.name}
+      role="img"
+    >
+      {initials}
+    </span>
+  )
+}

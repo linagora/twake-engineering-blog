@@ -1,0 +1,28 @@
+---
+import { githubEditUrl } from '../site.config';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import { postRelativeFile } from '../lib/posts';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  slug: string;
+  lang: Lang;
+}
+
+const { slug, lang } = Astro.props;
+const t = useTranslations(getLangFromUrl(Astro.url));
+const url = githubEditUrl(postRelativeFile(slug, lang));
+---
+
+<a
+  href={url}
+  class="inline-flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 20h9"></path>
+    <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z"></path>
+  </svg>
+  {t('post.editOnGitHub')}
+</a>

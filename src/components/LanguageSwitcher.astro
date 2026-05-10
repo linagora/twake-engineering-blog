@@ -1,0 +1,50 @@
+---
+import { getLangFromUrl, useTranslations, otherLang, localizedPath } from '../i18n/utils';
+import { hasTranslation } from '../lib/posts';
+
+const lang = getLangFromUrl(Astro.url);
+const target = otherLang(lang);
+const t = useTranslations(lang);
+
+// Build the equivalent URL in the other language.
+// For post pages we check whether a translation actually exists.
+const segments = Astro.url.pathname.split('/').filter(Boolean);
+let targetHref: string;
+let available = true;
+
+if (segments[0] === 'fr' || segments[0] === 'en') {
+  const rest = segments.slice(1);
+  // /[lang]/posts/[slug]
+  if (rest[0] === 'posts' && rest[1]) {
+    const slug = rest[1];
+    available = await hasTranslation(slug, target);
+    targetHref = available ? localizedPath(target, `posts/${slug}`) : localizedPath(target);
+  } else {
+    targetHref = localizedPath(target, rest.join('/'));
+  }
+} else {
+  targetHref = localizedPath(target);
+}
+---
+
+{
+  available ? (
+    <a
+      href={targetHref}
+      class="btn-ghost text-sm font-medium uppercase tracking-wide"
+      aria-label={t('lang.switchFull')}
+      title={t('lang.switchFull')}
+      hreflang={target}
+    >
+      {t('lang.switch')}
+    </a>
+  ) : (
+    <span
+      class="btn-ghost text-sm font-medium uppercase tracking-wide opacity-40 cursor-not-allowed"
+      aria-disabled="true"
+      title={t('lang.unavailable')}
+    >
+      {t('lang.switch')}
+    </span>
+  )
+}

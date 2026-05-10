@@ -1,0 +1,107 @@
+---
+import { getLangFromUrl, localizedPath, formatDateShort } from '../i18n/utils';
+import { getAuthors, type PostInfo } from '../lib/posts';
+import AuthorAvatar from './AuthorAvatar.astro';
+import AutoCover from './AutoCover.astro';
+
+interface Props {
+  post: PostInfo;
+  featured?: boolean;
+}
+
+const { post, featured = false } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const authors = await getAuthors(post.entry.data.authors);
+const href = localizedPath(lang, `posts/${post.slug}`);
+const firstTag = post.entry.data.tags?.[0];
+---
+
+<article
+  class:list={[
+    'group relative flex flex-col bg-bg rounded-2xl border border-border overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:border-fg/20',
+    featured && 'md:flex-row md:items-stretch',
+  ]}
+>
+  <a
+    href={href}
+    class:list={[
+      'block shrink-0 relative',
+      featured ? 'md:w-1/2 md:min-h-[22rem] aspect-[16/10] md:aspect-auto' : 'aspect-[16/9]',
+    ]}
+    aria-label={post.entry.data.title}
+  >
+    {
+      post.entry.data.cover ? (
+        <img
+          src={post.entry.data.cover}
+          alt={post.entry.data.coverAlt ?? ''}
+          class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <AutoCover
+          slug={post.slug}
+          tag={firstTag}
+          class="absolute inset-0 w-full h-full transition-transform duration-300 group-hover:scale-[1.03]"
+        />
+      )
+    }
+  </a>
+
+  <div
+    class:list={[
+      'flex flex-col gap-3 p-5 md:p-6',
+      featured && 'md:flex-1 md:p-10 md:gap-4 md:justify-center',
+    ]}
+  >
+    <div class="flex items-center gap-2 text-xs text-muted">
+      <time datetime={post.entry.data.date.toISOString()}>
+        {formatDateShort(post.entry.data.date, lang)}
+      </time>
+      {
+        firstTag && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span class="font-medium tracking-wide">#{firstTag}</span>
+          </>
+        )
+      }
+    </div>
+
+    <h2
+      class:list={[
+        'font-semibold tracking-tight leading-[1.15] text-fg group-hover:text-accent transition-colors',
+        featured ? 'text-2xl md:text-4xl' : 'text-xl',
+      ]}
+    >
+      <a href={href} class="after:absolute after:inset-0 after:content-['']">
+        {post.entry.data.title}
+      </a>
+    </h2>
+
+    <p
+      class:list={[
+        'text-muted leading-relaxed',
+        featured ? 'text-base md:text-lg' : 'text-[0.95rem]',
+      ]}
+    >
+      {post.entry.data.description}
+    </p>
+
+    {
+      authors.length > 0 && (
+        <div class="flex items-center gap-2 mt-auto pt-2">
+          <div class="flex -space-x-1.5">
+            {authors.map((a) => (
+              <AuthorAvatar author={a} size="sm" />
+            ))}
+          </div>
+          <span class="text-xs text-muted">
+            {authors.map((a) => a.data.name).join(', ')}
+          </span>
+        </div>
+      )
+    }
+  </div>
+</article>

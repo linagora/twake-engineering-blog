@@ -1,0 +1,118 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import AuthorAvatar from '../components/AuthorAvatar.astro';
+import TagPill from '../components/TagPill.astro';
+import EditOnGitHub from '../components/EditOnGitHub.astro';
+import AutoCover from '../components/AutoCover.astro';
+import { getLangFromUrl, useTranslations, formatDate, localizedPath } from '../i18n/utils';
+import { getAuthors, type PostInfo } from '../lib/posts';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  post: PostInfo;
+  minutesRead: number;
+  availableTranslations: Lang[];
+}
+
+const { post, minutesRead, availableTranslations } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const { data } = post.entry;
+const authors = await getAuthors(data.authors);
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  image={data.cover}
+  type="article"
+  publishedTime={data.date.toISOString()}
+  authors={authors.map((a) => a.data.name)}
+  canonical={data.canonical}
+  translations={availableTranslations}
+>
+  <article class="container-page py-10 md:py-14" data-pagefind-body>
+    <header class="max-w-(--container-prose) mb-10">
+      <div class="flex flex-wrap items-center gap-2 text-xs text-muted mb-4">
+        <time datetime={data.date.toISOString()}>{formatDate(data.date, lang)}</time>
+        <span aria-hidden="true">·</span>
+        <span>{minutesRead} {t('post.readingTime')}</span>
+        {
+          data.tags && data.tags.length > 0 && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span data-pagefind-filter="tag" class="flex items-center gap-1.5">
+                {data.tags.map((tag) => (
+                  <a href={localizedPath(lang, `tags/${tag}`)} class="hover:text-accent">
+                    #{tag}
+                  </a>
+                ))}
+              </span>
+            </>
+          )
+        }
+      </div>
+
+      <h1 class="text-3xl md:text-5xl font-bold tracking-tight leading-[1.1]">
+        {data.title}
+      </h1>
+      <p class="mt-4 text-lg text-muted-strong leading-relaxed">
+        {data.description}
+      </p>
+
+      <div class="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2">
+        {
+          authors.map((a) => (
+            <a
+              href={localizedPath(lang, `authors/${a.id}`)}
+              class="flex items-center gap-2.5 group"
+            >
+              <AuthorAvatar author={a} size="md" />
+              <span class="text-sm">
+                <span class="block font-medium text-fg group-hover:text-accent transition-colors">
+                  {a.data.name}
+                </span>
+                {a.data.title && (
+                  <span class="block text-xs text-muted">{a.data.title}</span>
+                )}
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </header>
+
+    <div class="mb-12 rounded-2xl overflow-hidden border border-border shadow-sm aspect-[16/8]">
+      {
+        data.cover ? (
+          <img
+            src={data.cover}
+            alt={data.coverAlt ?? ''}
+            class="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
+          />
+        ) : (
+          <AutoCover slug={post.slug} tag={data.tags?.[0]} class="w-full h-full" />
+        )
+      }
+    </div>
+
+    <div class="prose-article">
+      <slot />
+    </div>
+
+    <footer class="mt-14 pt-8 border-t border-border max-w-(--container-prose) flex flex-wrap items-center justify-between gap-4">
+      {
+        data.tags && data.tags.length > 0 && (
+          <div class="flex flex-wrap items-center gap-2">
+            {data.tags.map((tag) => (
+              <TagPill tag={tag} size="sm" />
+            ))}
+          </div>
+        )
+      }
+      <EditOnGitHub slug={post.slug} lang={post.lang} />
+    </footer>
+  </article>
+</BaseLayout>
