@@ -1,0 +1,38 @@
+name: Build and test
+
+on:
+  workflow_call:
+
+jobs:
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+
+      - name: Verify build output
+        run: test -f dist/index.html || (echo "dist/index.html not found" && exit 1)
