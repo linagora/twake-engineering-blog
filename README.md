@@ -147,8 +147,8 @@ src/
 ### Docker image
 
 ```bash
-docker build -t linagora/engineering-blog:latest .
-docker run -p 8080:8080 linagora/engineering-blog:latest
+docker build -t linagora/twake-engineering-blog:latest .
+docker run -p 8080:8080 linagora/twake-engineering-blog:latest
 ```
 
 The image serves the site on port `8080` via nginx.

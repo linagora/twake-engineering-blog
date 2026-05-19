@@ -8,7 +8,7 @@ export const SITE = {
   },
   github: {
     org: 'linagora',
-    repo: 'engineering-blog',
+    repo: 'twake-engineering-blog',
     branch: 'main',
   },
   social: {
