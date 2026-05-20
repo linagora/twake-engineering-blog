@@ -1,7 +1,7 @@
 export const SITE = {
   name: 'Linagora Engineering',
   shortName: 'Engineering',
-  url: 'https://engineering.linagora.com',
+  url: 'https://blog.twake.app',
   description: {
     fr: "Le blog d'ingénierie de Linagora — articles techniques, retours d'expérience et open source.",
     en: 'The Linagora engineering blog — technical articles, lessons learned and open source.',
