@@ -54,6 +54,8 @@ As you explore this ecosystem, there are two specific namespaces worth tattooing
 
 Behind every one of those addresses hums an engine called the homeserver. This software implements the core [Matrix client-server API spec](https://spec.matrix.org/latest/client-server-api/) and diligently juggles three primary jobs: acting as your account keeper, serving as your client's waiter, and operating as an embassy to every other servers out there.
 
+![Matrix Federation Schema Overview](fed.png)
+
 Because of this setup, your client app of choice (*being [TwakeChat](https://twake.app/), [FluffyChat](https://fluffychat.im/m), [Cinny](https://cinny.in/), or else*) talks to exactly one homeserver. You log in once, grab a session token, and every single move you make routes through that single machine. Your client never has to know a foreign server even exists; that is the homeserver's problem, by design.
 
 Naturally, these server implementations come in a few different flavors depending on your performance preferences:
@@ -109,6 +111,8 @@ To keep this stream organized, events are broadly divided into two main camps:
 ## History as a Directed Acyclic Graph (DAG)
 
 Because events are happening concurrently across different servers, room history cannot be stored as a tidy, sequential list. Instead, it is structured as a Directed Acyclic Graph, or DAG.
+
+![DAG Representation](dag.png)
 
 Why choose this level of structural complexity? Consider the environment: you have independent servers scattered globally writing to the database at the exact same millisecond with no central referee. A plain list requires a centralized scorekeeper to decide who went first. Because Matrix has none, a DAG allows each individual server to append events to whatever reality it is currently looking at.
 
