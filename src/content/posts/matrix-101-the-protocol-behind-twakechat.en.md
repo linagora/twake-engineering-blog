@@ -23,11 +23,11 @@ So, light up, take a sip, and settle in. We'll unpack exactly how it works.
 
 Take a look at your dock right now. You likely have Slack running the day job, WhatsApp keeping the family chat alive, and Discord humming for whatever hobby owns your evenings. Maybe you're also stuck on some clunky corporate tool nobody loves, sort of a relic of a decision someone made three reorgs ago.
 
-Here is what none of these apps will ever admit out loud: they don’t talk to each other, and that's not an accident. It’s the business model.
+Here is what none of these apps will ever admit out loud: they don't talk to each other, and that's not an accident. It's the business model.
 
-Your messages and your social graph are intentionally locked behind someone else’s proprietary API. An API that can vanish the moment it stops being profitable. You are effectively ghosted by your own chat history, Irish-goodbye style.
+Your messages and your social graph are intentionally locked behind someone else's proprietary API. An API that can vanish the moment it stops being profitable. You are effectively ghosted by your own chat history, Irish-goodbye style.
 
-Except, in a brilliant plot twist, we actually solved this exact puzzle forty years ago. It’s called email, and the tech industry just collectively chose to forget it.
+Except, in a brilliant plot twist, we actually solved this exact puzzle forty years ago. It's called email, and the tech industry just collectively chose to forget it.
 
 Think about it: when a message hops from an app like Twake Mail to the outside world, we don't ask for permission. The sending server simply checks the MX record of the destination like a digital address book, opens a direct line to the designated server, and hands the letter over. There is no bouncer and no velvet rope. That open infrastructure is precisely why email outlived every single walled garden built to replace it; nobody owns the protocol, so anyone can run their own post office.
 
@@ -35,13 +35,13 @@ Matrix takes that time-tested architecture and gives it a much-needed glow-up fo
 
 Though, granted, the comparison isn't entirely perfect; while email is fundamentally fire-and-forget, Matrix has to keep a live, synchronized, conversation in lockstep across an entire global network. Anyway, the heartbeat underneath remains identical: an open protocol, no boss server, and everyone talking directly.
 
-If you want the ultimate elevator pitch, one we’ll spend the rest of this piece earning, it’s this: **Matrix is essentially email in Git.**
+If you want the ultimate elevator pitch, one we'll spend the rest of this piece earning, it's this: **Matrix is essentially email in Git.**
 
 ## Your Address Is Your Identity
 
 To understand how this functions in practice, we have to start with how you are found on the network. A standard Matrix ID reads like this: `@alice:wonder.land`. It looks cute and very Lewis Carroll, but it is doing some heavy engineering work under the hood.
 
-The part after the colon, `wonder.land`, isn’t a vanity flourish, that's pure routing. So any foreign server trying to reach Alice resolves that domain like a normal hostname, locates her specific homeserver, and connects to it directly. Identity and network address are fused into one single string, requiring just one lookup with no bloated central directory standing in the way.
+The part after the colon, `wonder.land`, isn't a vanity flourish, that's pure routing. So any foreign server trying to reach Alice resolves that domain like a normal hostname, locates her specific homeserver, and connects to it directly. Identity and network address are fused into one single string, requiring just one lookup with no bloated central directory standing in the way.
 
 From a sociological perspective, this yields a deeper truth: Matrix identities aren't just rows in somebody's centralized spreadsheet. You can think of `@alice:wonder.land` and `@bob:build.er` as completely separate citizens of entirely different countries, who simply happen to speak the same diplomatic language.
 
@@ -78,7 +78,7 @@ To visualize this, let's return to our original analogy of Git: a Matrix room is
 
 This continuous synchronization happens over the [Matrix server-server API](https://spec.matrix.org/latest/server-server-api/), more commonly known as the Federation API. When a homeserver receives a new event, it verifies its legitimacy, files it locally, and fans it out over authenticated HTTPS.
 
-Every receiving server double-checks the homework before passing it along. Thanks to this rigor, nobody can fake being someone they're not; the entire exchange is locked down tight with `ed25519` signing keysm the cryptographic equivalent of a notarized signature that nobody can forge.
+Every receiving server double-checks the homework before passing it along, and this check is pure cryptography, no phone call to the client, no "hey, did you really send this?" ping back to Alice. Each homeserver signs its outgoing events with its own `ed25519` server key. The receiving server fetches that key via `/_matrix/key/v2/server`, verifies the signature against the event, and moves on. This proves the event genuinely came from that homeserver; it does not prove a specific human typed it. That second, stronger guarantee is a separate job, handled by the E2EE layer further down.
 
 ## Everything Is An Event
 
