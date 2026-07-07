@@ -178,11 +178,11 @@ For macroscopic control, governance extends to Server ACLs (Access Control Lists
 
 If decentralized governance sounds complex, the privacy layer takes it a step further. End-to-end encryption in Matrix isn't just a basic binary switch you flip on; it is a sophisticated, multi-course cryptographic meal:
 
-* **Device identity keys**: Long-term keys that remain persistent for the duration of a session.
-* **One-time prekeys**: Ephemeral keys published to the server, spent once by connecting peers, and periodically restocked.
-* **Olm session keys**: A ratchet-based protocol used to secure direct, one-on-one communication, moving forward with every single message sent.
-* **Megolm session keys**: An optimized ratcheting protocol designed to handle heavy group chat traffic by rotating keys whenever a user joins or leaves the room.
-* **Key backup keys**: A secure, passphrase-protected cryptographic safety net used to recover history if a device gets lost down the back of the sofa.
+* **Device identity keys**: The main "ID card" for your device while you are logged in.
+* **Key backup keys**: Your personal safety net. A password-protected backup to restore your chat history if you lose your phone or computer.
+* **One-time pre-keys**: Single-use keys used to start a new chat.
+* **Olm session keys**: Keys for 1-on-1 chats. They change with every single message sent to keep the conversation completely private.
+* **Megolm session keys**: Keys for group chats. They change whenever someone joins or leaves the room so only current members can read the messages.
 
 Because of this intricate choreography, when a message occasionally fails to decrypt in your client, it rarely means the entire protocol has broken down. More often than not, it simply means one of these highly transient keys was temporarily lost in transit or rotated a fraction of a second too early.
 
